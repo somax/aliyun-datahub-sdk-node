@@ -1,5 +1,6 @@
 /**
  * 阿里云 Datahub Restful API 调用示例
+ * by MaXiaojun<somaxj@163.com>
  */
 const axios = require("axios");
 const crypto = require("crypto");
