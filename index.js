@@ -46,12 +46,12 @@ function buildCanonicalizedResource(reqOption) {
     // 1. 将CanonicalizedResource置成空字符串 “”；
     let _canonicalizedResource = "";
     let _url = reqOption.url;
-    // 2. 放入要访问的DataHub资源，如某个topic： /projects/test_project/topics/test_topic
+    // 2. 放入要访问的DataHub资源，如某个topic： /projects/test_project/topics/foo
     _canonicalizedResource += `${_url}`;
     // 3. 如果请求的资源包含额外的url参数，按照字典序，从小到大排列并以 & 为分隔符生成参数字符串。
     //    在CanonicalizedResource字符串尾添加 ？和参数字符串。
-    //    此时的CanonicalizedResource如：/projects/test_project/topics/test_topic/connectors/sink_odps?donetime
-    let hasQuery = false
+    //    此时的CanonicalizedResource如：/projects/test_project/topics/foo/connectors/sink_odps?donetime
+    let hasQuery = false //TODO 
     if (hasQuery) {
         let _orderedParams = "";
         _canonicalizedResource += `?${_orderedParams}`;
@@ -66,9 +66,7 @@ function buildCanonicalStr(reqOption) {
     let HTTPMethod = reqOption.method;
     let ContentType = reqOption.headers["Content-Type"];
     let date = reqOption.headers.Date;
-    let canonicalizedDataHubHeaders = buildCanonicalizedDataHubHeaders(
-        reqOption
-    );
+    let canonicalizedDataHubHeaders = buildCanonicalizedDataHubHeaders(reqOption);
     let canonicalizedResource = buildCanonicalizedResource(reqOption);
     let _canonicalStr = `${HTTPMethod}\n${ContentType}\n${date}\n${canonicalizedDataHubHeaders}\n${canonicalizedResource}`;
     console.log({_canonicalStr});
@@ -106,6 +104,7 @@ const datahubClient = axios.create({
     baseURL: ENDPOINT,
     timeout: 1000
 });
+
 
 // 测试 获取项目清单
 async function _do(method, url, data) {
@@ -149,13 +148,13 @@ async function _do(method, url, data) {
  * 3.名称长度限制在1-32个字节之间
  * POST /projects/<ProjectName> HTTP/1.1
  */
-// _do('POST','/projects/jk_new_project', { Comment: '新建测试项目'});
+// _do('POST','/projects/jk_test', { Comment: '新建测试项目'});
 
 /**
  * 查询Project
  * GET /projects/<ProjectName> HTTP/1.1
  */
-// _do('GET', '/projects/jk_new_project')
+// _do('GET', '/projects/jk_test')
 
 
 /**
@@ -168,14 +167,14 @@ async function _do(method, url, data) {
  * 更新 Project
  * PUT /projects/<ProjectName> HTTP/1.1
  */
-// _do('PUT', '/projects/jk_new_project', { Comment: '测试更新描述'})
+// _do('PUT', '/projects/jk_test', { Comment: '测试更新描述'})
 
 
 /**
  * 删除Project
  * DELETE /projects/<ProjectName> HTTP/1.1
  */
-// _do('DELETE', '/projects/jk_new_project')
+// _do('DELETE', '/projects/jk_test')
 
 /**
  * 创建Topic
@@ -190,7 +189,7 @@ async function _do(method, url, data) {
     }
 */
 // _do('POST',
-//     '/projects/jk_new_project/topics/test_topic',
+//     '/projects/jk_test/topics/foo',
 //     {
 //         Action: 'create',
 //         ShardCount: 1,
@@ -205,13 +204,13 @@ async function _do(method, url, data) {
  * 查询Topic
  * GET /projects/<ProjectName>/topics/<TopicName> HTTP/1.1
  */
-// _do('GET','/projects/jk_new_project/topics/test_topic')
+// _do('GET','/projects/jk_test/topics/foo')
 
 /**
  * 查询Topic列表
  * GET /projects/<ProjectName>/topics HTTP/1.1
  */
-// _do('GET','/projects/jk_new_project/topics')
+// _do('GET','/projects/jk_test/topics')
 
 
 /**
@@ -221,20 +220,20 @@ async function _do(method, url, data) {
         "Comment": "update comment"
     }
  */
-// _do('PUT','/projects/jk_new_project/topics/test_topic',{Comment: "更新测试描述"})
+// _do('PUT','/projects/jk_test/topics/foo',{Comment: "更新测试描述"})
 
 
 /**
  * 删除Topic
  * DELETE /projects/<ProjectName>/topics/<TopicName> HTTP/1.1
  */
-// _do('DELETE','/projects/jk_new_project/topics/test_topic')
+// _do('DELETE','/projects/jk_test/topics/foo')
 
 /**
  * 获取Shard列表
  * GET /projects/<ProjectName>/topics/<TopicName>/shards HTTP/1.1
  */
-// _do('GET','/projects/jk_new_project/topics/test_topic')
+// _do('GET','/projects/jk_test/topics/foo/shards')
 
 /**
  * 分裂Shard
@@ -245,7 +244,7 @@ async function _do(method, url, data) {
         "SplitKey": "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
     }
  */
-// _do('POST','/projects/jk_new_project/topics/test_topic/shards', {
+// _do('POST','/projects/jk_test/topics/foo/shards', {
 //     Action: "split",
 //     ShardId: "0",
 //     SplitKey: "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -261,7 +260,7 @@ async function _do(method, url, data) {
         "AdjacentShardId": "1"
     }
  */
-// _do('POST','/projects/jk_new_project/topics/test_topic/shards', {
+// _do('POST','/projects/jk_test/topics/foo/shards', {
 //     Action: "merge",
 //     ShardId: "1",
 //     AdjacentShardId: "2"
@@ -274,13 +273,14 @@ async function _do(method, url, data) {
     "Action": "cursor",
     "Type": "SEQUENCE", // OLDEST, LATEST, SYSTEM_TIME, SEQUENCE
     "Sequence": 1
+    SystemTime: 1598516937840, // Type为SYSTEM_TIME时填写，单位Ms
+    Sequence: 4 // Type为SEQUENCE时填写
 }
  */
-_do('POST', '/projects/jk_new_project/topics/test_topic/shards/3', {
-    Action: "cursor",
-    Type: "OLDEST",
-    Sequence: 4
-})
+// _do('POST', '/projects/jk_test/topics/foo/shards/0', {
+//     Action: "cursor",
+//     Type: "LATEST"
+// })
 
 /**
  * 写入数据 - 不按shard写入
@@ -300,11 +300,11 @@ _do('POST', '/projects/jk_new_project/topics/test_topic/shards/3', {
         ]
     }
  */
-// _do('POST', '/projects/jk_new_project/topics/test_topic/shards', {
+// _do('POST', '/projects/jk_test/topics/foo/shards', {
 //     Action: "pub",
 //     Records: [
 //         {
-//             ShardId: "3",
+//             ShardId: "0",
 //             // Attributes: {
 //             //     "attr1": "value1",
 //             //     "attr2": "value2"
@@ -325,9 +325,9 @@ _do('POST', '/projects/jk_new_project/topics/test_topic/shards/3', {
     }
     先查询 cursor
  */
-// _do('POST', '/projects/jk_new_project/topics/test_topic/shards/3', {
+// _do('POST', '/projects/jk_test/topics/foo/shards/0', {
 //     Action: "sub",
-//     Cursor: "30005f476ec900000000000000000000",
+//     Cursor: "30005f47ca6a00000000000000000000",
 //     Limit: 10
 // })
 
@@ -340,12 +340,13 @@ _do('POST', '/projects/jk_new_project/topics/test_topic/shards/3', {
         "FieldType": "BIGINT"
     }
  */
-_do('POST', '/projects/jk_new_project/topics/test_topic',{
-    Action: "appendfield",
-    FieldName: "field3",
-    FieldType: "STRING"
-})
+// _do('POST', '/projects/jk_test/topics/foo',{
+//     Action: "appendfield",
+//     FieldName: "field3",
+//     FieldType: "STRING"
+// })
 
+// ============== Connector 数据同步 ===============
 /**
  * 创建Connector
  * POST /projects/<ProjectName>/topics/<TopicName>/connectors/<ConnectorType> HTTP/1.1
@@ -375,7 +376,6 @@ _do('POST', '/projects/jk_new_project/topics/test_topic',{
     }
  */
 
-
 /**
  * 获取Connector Shard状态信息
  * POST /projects/<ProjectName>/topics/<TopicName>/connectors/<ConnectorType> HTTP/1.1
@@ -385,12 +385,14 @@ _do('POST', '/projects/jk_new_project/topics/test_topic',{
     }
  */
 
-
 /**
  * Append Connector Field
  * POST /projects//topics//connectors/ HTTP/1.1
  */
 
+
+
+// ============ subscription 数据订阅: 用于服务端存储指针 ==============
 /**
  * 创建订阅
  * POST /projects/<ProjectName>/topics/<TopicName>/subscriptions HTTP/1.1
@@ -399,12 +401,17 @@ _do('POST', '/projects/jk_new_project/topics/test_topic',{
         "Comment": "xxxx"
     }
  */
-
+// _do('POST','/projects/jk_test/topics/foo/subscriptions',
+// {
+//     Action: "create",
+//     Comment: 'create from api'
+// })
 
 /**
  * 查询订阅
  * GET /projects/<ProjectName>/topics/<TopicName>/subscriptions/<SubId> HTTP/1.1
  */
+// _do('GET','/projects/jk_test/topics/foo/subscriptions/1598602034559OYGWN')
 
 /**
  * 查询订阅列表
@@ -415,17 +422,27 @@ _do('POST', '/projects/jk_new_project/topics/test_topic',{
         "PageSize": 10
     }
  */
-
+// _do('POST','/projects/jk_test/topics/foo/subscriptions',
+// {
+//     "Action": "list",
+//     "PageIndex": 1,
+//     "PageSize": 10
+// })
 
 /**
  * 删除订阅
  * DELETE /projects/<ProjectName>/topics/<TopicName>/subscriptions/<SubId> HTTP/1.1
  */
+// _do('DELETE', '/projects/jk_test/topics/foo/subscriptions/1598600157285CIFF5')
+
 
 /**
  * 更新订阅状态
  * PUT /projects/<ProjectName>/topics/<TopicName>/subscriptions/<SubId> HTTP/1.1
  */
+// _do('PUT','/projects/jk_test/topics/foo/subscriptions/1598602034559OYGWN',{
+//     "State": 1
+// })
 
 /**
  * open点位session
@@ -435,6 +452,10 @@ _do('POST', '/projects/jk_new_project/topics/test_topic',{
         "ShardIds": ["0"]
     }
  */
+// _do('POST','/projects/jk_test/topics/foo/subscriptions/1598602034559OYGWN/offsets',{
+//     "Action": "open",
+//     "ShardIds": ["0"]
+// })
 
 /**
  * 查询点位
@@ -444,6 +465,10 @@ _do('POST', '/projects/jk_new_project/topics/test_topic',{
         "ShardIds": ["0"]
     }
  */
+// _do('POST','/projects/jk_test/topics/foo/subscriptions/1598602034559OYGWN/offsets',{
+//     "Action": "get",
+//     "ShardIds": ["0"]
+// })
 
 /**
  * 提交点位
@@ -460,3 +485,14 @@ _do('POST', '/projects/jk_new_project/topics/test_topic',{
         }
     }
  */
+// _do('PUT','/projects/jk_test/topics/foo/subscriptions/1598602034559OYGWN/offsets',{
+//     "Action": "commit",
+//     "Offsets": {
+//         "0": {
+//             "Timestamp": 100000000000,
+//             "Sequence": 2,
+//             "Version": 0,
+//             "SessionId": 1
+//         }
+//     }
+// })
