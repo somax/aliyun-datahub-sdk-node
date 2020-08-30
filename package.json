@@ -1,6 +1,6 @@
 {
-  "name": "datahub-node",
-  "version": "1.0.0",
+  "name": "aliyun-datahub-sdk-node",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
