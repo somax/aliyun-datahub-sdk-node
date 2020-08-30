@@ -1,5 +1,5 @@
 const Datahub = require("../lib/datahub");
-const { RecordType, FieldType, Options, Field } = Datahub
+const { RecordType, FieldType, Options, Field, RecordSchema } = Datahub
 
 // const dh = new Datahub({
 //     ENDPOINT: "https://dh-cn-shanghai.aliyuncs.com",
@@ -9,6 +9,8 @@ const { RecordType, FieldType, Options, Field } = Datahub
 
 const opt = new Options('https://dh-cn-shanghai.aliyuncs.com', process.env.ACCESS_KEY_ID, process.env.ACCESS_KEY_SECRET)
 const dh = new Datahub(opt)
+
+
 
 async function test() {
     let res;
@@ -34,27 +36,29 @@ async function test() {
 
 
 
-    let fields = [
-        new Field('field_string', FieldType.STRING),
-        new Field('field_integer', FieldType.INTEGER),
-        new Field('field_double', FieldType.DOUBLE),
-        new Field('field_boolean', FieldType.BOOLEAN),
-        new Field('field_timestamp', FieldType.TIMESTAMP),
-        new Field('field_decimal', FieldType.DECIMAL),
-    ]
+    // let fields = [
+    //     new Field('field_string', FieldType.STRING),
+    //     new Field('field_integer', FieldType.INTEGER),
+    //     new Field('field_double', FieldType.DOUBLE),
+    //     new Field('field_boolean', FieldType.BOOLEAN),
+    //     new Field('field_timestamp', FieldType.TIMESTAMP),
+    //     new Field('field_decimal', FieldType.DECIMAL),
+    // ]
 
-    let recordSchema = {
-        fields
-        // [
-        //     { name: 'field_string', type: 'STRING' },
-        //     { name: 'field_bigint', type: 'BIGINT' },
-        //     { name: 'field_double', type: 'Double' },
-        //     { name: 'field_boolean', type: 'Boolean' , notnull: true},
-        //     { name: 'field_timestamp', type: 'timestamp', notnull: false }
-        // ]
-    }
+    // let recordSchema = {
+    //     fields
+    // }
 
-    console.log(recordSchema.fields);
+    let recordSchema = new RecordSchema([
+        ['field_string', FieldType.STRING, true],
+        ['field_integer', FieldType.INTEGER, true],
+        ['field_double', FieldType.DOUBLE, true],
+        ['field_boolean', FieldType.BOOLEAN, true],
+        ['field_timestamp', FieldType.TIMESTAMP, true],
+        // ['field_decimal', FieldType.DECIMAL, true],
+    ])
+
+    console.log(recordSchema);
 
     let data = {
         field_string: 'abc',
@@ -64,28 +68,29 @@ async function test() {
         field_timestamp: 'Sun Aug 30 2020 22:03:35 GMT+0800 (GMT+08:00)',
         field_decimal: 123.5
     }
-    let record = ['abc', '1', '12.1', 'false', String(Date.now()), '123.5']
+    // let record = ['abc', '1', '12.1', 'false', String(Date.now()), '123.5']
+    let record = ['abc', '1', '12.1', 'false', String(Date.now())]
 
 
-    function _record2Data(record, schema) {
-        let data = {}
-        schema.fields.forEach((item, index) => {
-            data[item.name] = FieldType.convertToJavaScriptType(record[index], item.type)
-        });
+    // function _record2Data(record, schema) {
+    //     let data = {}
+    //     schema.fields.forEach((item, index) => {
+    //         data[item.name] = FieldType.convertToJavaScriptType(record[index], item.type)
+    //     });
 
-        return data
-    }
+    //     return data
+    // }
 
-    function _data2Record(data, schema) {
-        let record = []
-        schema.fields.forEach((item, index) => {
-            record[index] = FieldType.convertToDatahubType(data[item.name], item.type)
-        });
-        return record
-    }
+    // function _data2Record(data, schema) {
+    //     let record = []
+    //     schema.fields.forEach((item, index) => {
+    //         record[index] = FieldType.convertToDatahubType(data[item.name], item.type)
+    //     });
+    //     return record
+    // }
 
-    console.log(_record2Data(record, recordSchema));
-    console.log(_data2Record(data, recordSchema))
+    // console.log(_record2Data(record, recordSchema));
+    // console.log(_data2Record(data, recordSchema))
     // try {
     //     res = await dh.createTopic('jk_test1','topic3', recordSchema, 'test topic3', RecordType.TUPLE)
     // } catch (error) {
@@ -93,7 +98,7 @@ async function test() {
     // }
 
     // dh.createTopic('jk_test1','topic6', recordSchema, 'test topic', RecordType.TUPLE)
-    // dh.createTopic('jk_test1','topic5', recordSchema)
+    // dh.createTopic('jk_test1','topic8', recordSchema)
     // dh.deleteTopic('jk_test1','topic3')
     // dh.updateTopic('jk_test1','topic2','update topic...')
     // dh.getTopic('jk_test1','topic2')
@@ -102,16 +107,17 @@ async function test() {
     // dh.getCursor('jk_test1','topic2', 0 , 'OLDEST')
     // dh.getCursor('jk_test1','topic2')
 
-    // dh.getRecords('jk_test1', 'topic2', '30000000000000000000000000000000', 0)
-    // dh.getRecords('jk_test1', 'topic2', '30000000000000000000000000000000')
+    // dh.pull('jk_test1', 'topic2', '30000000000000000000000000000000', 0)
+    dh.pull('jk_test1', 'topic5', recordSchema, '30000000000000000000000000000000')
 
-    // // dh.pub('jk_test1','topic2','0', {attr1:'888'}, ['a','1'])
+    // dh.push('jk_test1','topic5','0', {attr1:'888'}, record)
 
 
 
     // .then(res => console.log(JSON.stringify(res),res.data.RecordSchema))
-    // .then(res => console.log(JSON.stringify(res),res.data))
-    // .catch(err => console.error('xxxx',err))
+    .then(res => console.log(JSON.stringify(res),res.data.Records))
+    // .then(res => console.log(JSON.stringify(res),res))
+    .catch(err => console.error('xxxx',err))
 
 
 
