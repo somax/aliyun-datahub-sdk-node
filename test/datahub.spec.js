@@ -1,5 +1,5 @@
 const Datahub = require("../lib/datahub");
-const { RecordType, FieldType, Options, Field, RecordSchema } = Datahub
+const { RecordType, FieldType, Options, Field, RecordSchema, TupleRecord } = Datahub
 
 // const dh = new Datahub({
 //     ENDPOINT: "https://dh-cn-shanghai.aliyuncs.com",
@@ -66,10 +66,10 @@ async function test() {
         field_double: 12.1,
         field_boolean: false,
         field_timestamp: 'Sun Aug 30 2020 22:03:35 GMT+0800 (GMT+08:00)',
-        field_decimal: 123.5
+        // field_decimal: 123.5
     }
     // let record = ['abc', '1', '12.1', 'false', String(Date.now()), '123.5']
-    let record = ['abc', '1', '12.1', 'false', String(Date.now())]
+    // let record = ['abc', '1', '12.1', 'false', String(Date.now())]
 
 
     // function _record2Data(record, schema) {
@@ -110,7 +110,9 @@ async function test() {
     // dh.pull('jk_test1', 'topic2', '30000000000000000000000000000000', 0)
     dh.pull('jk_test1', 'topic5', recordSchema, '30000000000000000000000000000000')
 
-    // dh.push('jk_test1','topic5','0', {attr1:'888'}, record)
+    // let records = []
+    // records.push(new TupleRecord(data, recordSchema))
+    // dh.push('jk_test1','topic5', records)
 
 
 
