@@ -1,5 +1,11 @@
+/**
+ * 测试代码
+ */
 const Datahub = require("../lib/datahub");
-const { RecordType, FieldType, Options, Field, RecordSchema, TupleRecord } = Datahub
+const assert = require('assert');
+
+
+const { RecordType, FieldType, Options, Field, RecordSchema, TupleRecord, BolbRecord } = Datahub
 
 // const dh = new Datahub({
 //     ENDPOINT: "https://dh-cn-shanghai.aliyuncs.com",
@@ -10,9 +16,74 @@ const { RecordType, FieldType, Options, Field, RecordSchema, TupleRecord } = Dat
 const opt = new Options('https://dh-cn-shanghai.aliyuncs.com', process.env.ACCESS_KEY_ID, process.env.ACCESS_KEY_SECRET)
 const dh = new Datahub(opt)
 
+async function sleep(ms) {
+    console.log('sleep', ms);
+    return await new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const spl = '\n---------------------------------\n\n'
+async function log(method, ...args) {
+    try {
+        console.log(method, await dh[method](...args), spl);
+    } catch (error) {
+        console.error(method, error, spl)
+    }
+}
+
+function test(expect, method, ...args) {
+    return async () => {
+        let res = await dh[method](...args);
+        assert.equal(expect, res.statusText);
+        console.log(JSON.stringify(res, null, 2));
+        sleep(1000);
+    }
+}
+
+async function prepare(method, ...args) {
+    try { 
+        await dh[method](...args);
+        sleep(1000);
+    } catch (error) { }
+
+}
+
+const testProjectName = 'jk_auto_test_project'
+const testTopicName = 'auto_test_topic'
 
 
-async function test() {
+prepare('deleteProject', testProjectName)
+
+describe('Project 操作测试', function () {
+    it('创建', test('Created', 'createProject', testProjectName, 'test project'));
+    it('更新', test('OK', 'updateProject', testProjectName, '测试要删除的项目'));
+    it('查询', test('OK', 'getProject', testProjectName));
+    it('列表', test('OK', 'listProjects', testProjectName));
+    it('删除', test('OK', 'deleteProject', testProjectName));
+});
+
+
+prepare('createProject', testProjectName)
+
+const testRecordSchema = new RecordSchema([
+    ['field_string', FieldType.STRING, true],
+    ['field_integer', FieldType.INTEGER, true],
+    ['field_double', FieldType.DOUBLE, true],
+    ['field_boolean', FieldType.BOOLEAN, true],
+    ['field_decimal', FieldType.DECIMAL, true],
+    ['field_timestamp', FieldType.TIMESTAMP, true],
+])
+
+describe('Topic 操作测试', function() {
+    it('创建', test('Created', 'createTopic', testProjectName, testTopicName, testRecordSchema, 'test topic', RecordType.TUPLE));
+    sleep(1000)
+    it('更新', test('OK', 'updateTopic',testProjectName, testTopicName,'测试要删除的topic'));
+    it('查询', test('OK', 'getTopic', testProjectName, testTopicName));
+    it('列表', test('OK', 'listTopics', testProjectName, testTopicName));
+    it('删除', test('OK', 'deleteTopic', testProjectName, testTopicName));
+});
+
+
+async function test1() {
     let res;
     // console.log(dh);
 
@@ -22,43 +93,19 @@ async function test() {
     //     ACCESS_KEY_SECRET: 'xxxx' ,
     // });
 
-    // res = await dh.deleteProject('jk_test1')
-    // res = await dh.createProject('jk_test1','测试项目')
-    // res = await dh.updateProject('jk_test1','测试项目更新描述111')
-    // res = await dh.getProject('jk_test1')
-    // res = await dh.listProjects()
+    console.log('============= start ============>');
 
-    // res = await dh.listTopics('jk_test1')
-    // res = await dh.getTopic('jk_test1', 'topic3')
-
-
-
-
-
-
-    // let fields = [
-    //     new Field('field_string', FieldType.STRING),
-    //     new Field('field_integer', FieldType.INTEGER),
-    //     new Field('field_double', FieldType.DOUBLE),
-    //     new Field('field_boolean', FieldType.BOOLEAN),
-    //     new Field('field_timestamp', FieldType.TIMESTAMP),
-    //     new Field('field_decimal', FieldType.DECIMAL),
-    // ]
-
-    // let recordSchema = {
-    //     fields
-    // }
 
     let recordSchema = new RecordSchema([
         ['field_string', FieldType.STRING, true],
         ['field_integer', FieldType.INTEGER, true],
         ['field_double', FieldType.DOUBLE, true],
         ['field_boolean', FieldType.BOOLEAN, true],
+        ['field_decimal', FieldType.DECIMAL, true],
         ['field_timestamp', FieldType.TIMESTAMP, true],
-        // ['field_decimal', FieldType.DECIMAL, true],
     ])
 
-    console.log(recordSchema);
+    // console.log(recordSchema);
 
     let data = {
         field_string: 'abc',
@@ -72,22 +119,6 @@ async function test() {
     // let record = ['abc', '1', '12.1', 'false', String(Date.now())]
 
 
-    // function _record2Data(record, schema) {
-    //     let data = {}
-    //     schema.fields.forEach((item, index) => {
-    //         data[item.name] = FieldType.convertToJavaScriptType(record[index], item.type)
-    //     });
-
-    //     return data
-    // }
-
-    // function _data2Record(data, schema) {
-    //     let record = []
-    //     schema.fields.forEach((item, index) => {
-    //         record[index] = FieldType.convertToDatahubType(data[item.name], item.type)
-    //     });
-    //     return record
-    // }
 
     // console.log(_record2Data(record, recordSchema));
     // console.log(_data2Record(data, recordSchema))
@@ -107,24 +138,23 @@ async function test() {
     // dh.getCursor('jk_test1','topic2', 0 , 'OLDEST')
     // dh.getCursor('jk_test1','topic2')
 
-    // dh.pull('jk_test1', 'topic2', '30000000000000000000000000000000', 0)
-    dh.pull('jk_test1', 'topic5', recordSchema, '30000000000000000000000000000000')
+
+    // dh.pull('jk_test1', 'topic5', recordSchema, '30000000000000000000000000000000')
+    // .then(res => console.log(JSON.stringify(res),res.data.Records))
+    // .catch(err => console.error('xxxx',err))
 
     // let records = []
     // records.push(new TupleRecord(data, recordSchema))
     // dh.push('jk_test1','topic5', records)
-
-
-
-    // .then(res => console.log(JSON.stringify(res),res.data.RecordSchema))
-    .then(res => console.log(JSON.stringify(res),res.data.Records))
-    // .then(res => console.log(JSON.stringify(res),res))
-    .catch(err => console.error('xxxx',err))
-
-
-
+    // // .then(res => console.log(JSON.stringify(res),res.data.RecordSchema))
+    // .then(res => console.log(JSON.stringify(res)))
+    // .catch(err => console.error('xxxx',err))
 
     // dh.openOffsetSession()
+
+
+    console.log('\n<============= end =============');
+
 }
 
-test()
+// test()
