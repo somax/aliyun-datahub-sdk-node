@@ -1,13 +1,13 @@
 {
   "name": "aliyun-datahub-sdk-node",
   "version": "0.1.0",
-  "description": "",
+  "description": "阿里云 Datahub NodeJS SDK",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha -t 5000"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Xiaojun Ma (https://github.com/somax)",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.20.0",
     "mocha": "^8.1.3"
