@@ -1,4 +1,4 @@
-# Datahub NodeJS Client
+# Aliyun Datahub NodeJS SDK
 
 ## 阿里云 Datahub Restful API 的 NodeJS 封装
 
@@ -9,11 +9,11 @@
 ## Usage
 
 ```sh
-yarn add aliyun-datahub-sdk
+yarn add aliyun-datahub-sdk-node
 ```
 
 ```js
-const Datahub = require("../lib/datahub");
+const Datahub = require("aliyun-datahub-sdk-node");
 const { RecordType, FieldType, DatahubOptions, Field, 
         RecordSchema, TupleRecord, BlobRecord, CursorType } = Datahub;
 
