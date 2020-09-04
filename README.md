@@ -50,10 +50,10 @@ let testData = {
 }
 let testTupleRecords = []
 testTupleRecords.push(new TupleRecord(testData, testRecordSchema))
-dh.push('new_project', 'new_tuple_topic', testTupleRecords))
+await dh.push('new_project', 'new_tuple_topic', testTupleRecords))
 
 let testBlobRecords = [new BlobRecord('test')]
-dh.push('new_project', 'new_blob_topic', testBlobRecords))
+await dh.push('new_project', 'new_blob_topic', testBlobRecords))
 
 // 拉取数据(从头开始)
 let _schema = (await dh.getTopic('new_project', 'new_tuple_topic')).data.RecordSchema
