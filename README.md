@@ -1,4 +1,4 @@
-# Datahub NodeJS Client
+# Aliyun Datahub NodeJS SDK
 
 ## 阿里云 Datahub Restful API 的 NodeJS 封装
 
@@ -9,11 +9,11 @@
 ## Usage
 
 ```sh
-yarn add aliyun-datahub-sdk
+yarn add aliyun-datahub-sdk-node
 ```
 
 ```js
-const Datahub = require("../lib/datahub");
+const Datahub = require("aliyun-datahub-sdk-node");
 const { RecordType, FieldType, DatahubOptions, Field, 
         RecordSchema, TupleRecord, BlobRecord, CursorType } = Datahub;
 
@@ -50,10 +50,10 @@ let testData = {
 }
 let testTupleRecords = []
 testTupleRecords.push(new TupleRecord(testData, testRecordSchema))
-dh.push('new_project', 'new_tuple_topic', testTupleRecords))
+await dh.push('new_project', 'new_tuple_topic', testTupleRecords))
 
 let testBlobRecords = [new BlobRecord('test')]
-dh.push('new_project', 'new_blob_topic', testBlobRecords))
+await dh.push('new_project', 'new_blob_topic', testBlobRecords))
 
 // 拉取数据(从头开始)
 let _schema = (await dh.getTopic('new_project', 'new_tuple_topic')).data.RecordSchema

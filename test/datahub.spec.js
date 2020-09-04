@@ -160,13 +160,13 @@ describe('Datahub 功能测试', function () {
         //     assert.strictEqual('OK', res.statusText);
         //     console.log(res.data);
         // })
-        it('pull-blob', async () => {
-            let cursor  = (await dh.getCursor(testProjectName, testTopicName)).data.Cursor
-            let res = await dh.pull(testProjectName, testTopicName, null, cursor)
-            assert.strictEqual('OK', res.statusText);
-            console.log(res.data);
-        })
 
+        // it('pull-blob', async () => {
+        //     let cursor  = (await dh.getCursor(testProjectName, testTopicName)).data.Cursor
+        //     let res = await dh.pull(testProjectName, testTopicName, null, cursor)
+        //     assert.strictEqual('OK', res.statusText);
+        //     console.log(res.data);
+        // })
 
         // it('appendField', async () => {
         //     assert.strictEqual('OK',
