@@ -59,8 +59,8 @@ await dh.push('new_project', 'new_blob_topic', testBlobRecords))
 let _schema = (await dh.getTopic('new_project', 'new_tuple_topic')).data.RecordSchema
 let _cursor = (await dh.getCursor('new_project', 'new_tuple_topic')).data.Cursor
 let res = await dh.pull('new_project', 'new_tuple_topic', _schema, _cursor)
-_cursor = res.NextCursor
-let records = res.Records
+_cursor = res.data.NextCursor
+let records = res.data.Records
 // ...更新 cursor 以循环获取数据
 
 // 如果是 blob 类型, schema 参数设置为空
